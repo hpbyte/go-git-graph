@@ -64,6 +64,8 @@ func scan(basePath string, path string, scanned map[string][]string) {
 				if _, err := os.Stat(entryPath); err == nil {
 					scanned[basePath] = append(scanned[basePath], entryPath)
 				}
+			} else if entryName == "node_modules" || entryName == "vendor" {
+				continue
 			} else {
 				scan(basePath, entryPath, scanned)
 			}
