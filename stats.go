@@ -7,12 +7,20 @@ import (
 	"log"
 )
 
+const outOfRange = 99999
+const daysInLastSixMonths = 183
+const weeksInLastSixMonths = 26
+
+type Stats interface {
+	Calculate() map[int][]int
+}
+
 type ContributionStats struct {
 	gitConfig *GitConfig
 	stats     map[int][]int
 }
 
-func (cs ContributionStats) aggregateStats(path string) {
+func (cs ContributionStats) aggregate(path string) {
 	repo, err := git.PlainOpen(path)
 	if err != nil {
 		log.Fatalf("failed to open the repo: %s\n", err)
@@ -41,7 +49,7 @@ func (cs ContributionStats) Calculate() map[int][]int {
 	repos := []string{"/Users/htoopyaelwin/Personal/adventofcode2023/.git"}
 
 	for _, repo := range repos {
-		cs.aggregateStats(repo)
+		cs.aggregate(repo)
 	}
 
 	return cs.stats
