@@ -2,19 +2,27 @@ package main
 
 import (
 	"fmt"
+	"log"
 )
 
 func main() {
-	args := LoadArgs()
-	fmt.Println("Welcome to GoGitGraph!, your chosen path: ", args.basePath)
+	args, err := LoadArgs()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	//res := ScanGitFolders(basePath)
+	fmt.Println("Welcome to GoGitGraph!, your chosen path: ", args.BasePath)
 
-	//Cache(res)
+	//res := GitFolderScanner{}.Scan(args.BasePath)
 
-	gitConfig := LoadGitConfig()
-	fmt.Println("git config email: ", gitConfig.User.Email)
-	fmt.Println("git config name: ", gitConfig.User.Name)
+	//Cacher{}.Create(res)
 
-	CalculateStats()
+	var gitConfig GitConfig
+	if err := gitConfig.Load(); err != nil {
+		log.Fatal(err)
+	}
+
+	contributionStats := ContributionStats{gitConfig: &gitConfig, stats: map[int][]int{}}.Calculate()
+
+	fmt.Println("calculated contributionStats: ", contributionStats)
 }

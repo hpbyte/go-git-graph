@@ -7,7 +7,12 @@ import (
 	"log"
 )
 
-func aggregateStats(path string, stats map[int][]int) {
+type ContributionStats struct {
+	gitConfig *GitConfig
+	stats     map[int][]int
+}
+
+func (cs ContributionStats) aggregateStats(path string) {
 	repo, err := git.PlainOpen(path)
 	if err != nil {
 		log.Fatalf("failed to open the repo: %s\n", err)
@@ -24,16 +29,20 @@ func aggregateStats(path string, stats map[int][]int) {
 	}
 
 	err = commits.ForEach(func(c *object.Commit) error {
-		fmt.Println(c.Committer.When)
+		if c.Author.Email == cs.gitConfig.User.Email {
+			fmt.Println(c.Committer.When)
+		}
+
 		return nil
 	})
 }
 
-func CalculateStats() {
+func (cs ContributionStats) Calculate() map[int][]int {
 	repos := []string{"/Users/htoopyaelwin/Personal/adventofcode2023/.git"}
-	stats := make(map[int][]int)
 
 	for _, repo := range repos {
-		aggregateStats(repo, stats)
+		cs.aggregateStats(repo)
 	}
+
+	return cs.stats
 }

@@ -1,11 +1,16 @@
 package main
 
 import (
+	"fmt"
 	"gopkg.in/ini.v1"
 	"log"
 	"os"
 	"path/filepath"
 )
+
+type Config interface {
+	Load() error
+}
 
 type GitConfig struct {
 	User struct {
@@ -14,7 +19,7 @@ type GitConfig struct {
 	} `ini:"user"`
 }
 
-func LoadGitConfig() GitConfig {
+func (gc *GitConfig) Load() error {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		log.Fatalf("error loading home dir: %s\n", err)
@@ -23,14 +28,13 @@ func LoadGitConfig() GitConfig {
 
 	config, err := ini.Load(gitConfigPath)
 	if err != nil {
-		log.Fatalf("error loading git config: %s\n", err)
+		return fmt.Errorf("error loading git config: %s\n", err)
 	}
 
-	var gitConfig GitConfig
-	err = config.MapTo(&gitConfig)
+	err = config.MapTo(&gc)
 	if err != nil {
-		log.Fatalf("error parsing .gitconfig: %s\n", err)
+		return fmt.Errorf("error parsing .gitconfig: %s\n", err)
 	}
 
-	return gitConfig
+	return nil
 }

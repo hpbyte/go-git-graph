@@ -2,32 +2,30 @@ package main
 
 import (
 	"flag"
-	"log"
+	"fmt"
 	"os"
 	"path/filepath"
 )
 
 type Args struct {
-	basePath string
+	BasePath string
 }
 
-func LoadArgs() Args {
+func LoadArgs() (Args, error) {
+	var args Args
+
 	currentDir, err := os.Getwd()
 	if err != nil {
-		log.Fatal(err)
+		return args, fmt.Errorf("error getting current dir: %w", err)
 	}
 
-	var path string
-	flag.StringVar(&path, "p", currentDir, "directory to cacluate stats for")
+	flag.StringVar(&args.BasePath, "p", currentDir, "directory to cacluate stats for")
 	flag.Parse()
 
-	basePath, err := filepath.Abs(path)
+	args.BasePath, err = filepath.Abs(args.BasePath)
 	if err != nil {
-		log.Panic("cannot find the directory provided!")
+		return args, fmt.Errorf("cannot find the directory provided!, %w", err)
 	}
 
-	var args Args
-	args.basePath = basePath
-
-	return args
+	return args, nil
 }

@@ -7,7 +7,9 @@ import (
 	"os"
 )
 
-func getCacheFilePath() (string, error) {
+type Cacher struct{}
+
+func (c Cacher) getCacheFilePath() (string, error) {
 	cacheFilePath := "./.cache.json"
 
 	if _, err := os.Stat(cacheFilePath); os.IsNotExist(err) {
@@ -23,8 +25,8 @@ func getCacheFilePath() (string, error) {
 	return cacheFilePath, nil
 }
 
-func Cache(data map[string][]string) {
-	cacheFilePath, err := getCacheFilePath()
+func (c Cacher) Create(data map[string][]string) {
+	cacheFilePath, err := c.getCacheFilePath()
 	if err != nil {
 		log.Fatal(err)
 		return
