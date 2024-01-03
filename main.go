@@ -26,7 +26,9 @@ func main() {
 
 	fmt.Println("Welcome to GoGitGraph!, your chosen path: ", basePath)
 
-	res := ScanGitFolders(basePath)
+	//res := ScanGitFolders(basePath)
 
-	Cache(res)
+	//Cache(res)
+
+	CalculateStats()
 }
