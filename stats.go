@@ -20,7 +20,7 @@ type ContributionStats struct {
 	stats     map[int][]int
 }
 
-func (cs ContributionStats) aggregate(path string) {
+func (cs *ContributionStats) aggregate(path string) {
 	repo, err := git.PlainOpen(path)
 	if err != nil {
 		log.Fatalf("failed to open the repo: %s\n", err)
