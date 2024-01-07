@@ -18,7 +18,9 @@ func main() {
 
 	//Cacher{}.Create(res)
 
-	contributionStats := ContributionStats{gitConfig: &config.GitConfig, stats: map[int][]int{}}.Calculate()
-
+	contributionStats := ContributionStats{gitConfig: &config.GitConfig, stats: map[string]int{}}.Calculate()
 	fmt.Println("calculated contributionStats: ", contributionStats)
+
+	contributionChart := ContributionChart{Data: contributionStats, Year: 2024}
+	contributionChart.Render()
 }

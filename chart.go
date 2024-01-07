@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"strconv"
+	"time"
 )
 
 type Color string
@@ -15,49 +18,44 @@ const (
 	ColorReset        = "\u001b[0m"
 )
 
+const layout = "2006-01-02"
+
 type Chart interface {
 	Render()
 }
 
 type ContributionChart struct {
-	Data map[int][]int
+	Data map[string]int
+	Year int
 }
 
 func (cc ContributionChart) Render() {
-	//
-}
+	// 7 (days) x 53 (weeks) grid 0s for a year with 0s as default
+	var grid [7][53]int
 
-func (cc ContributionChart) printCell(val int, today bool) {
-	escape := "\033[0;37;30m"
-	switch {
-	case val > 0 && val < 5:
-		escape = "\033[1;30;47m"
-	case val >= 5 && val < 10:
-		escape = "\033[1;30;43m"
-	case val >= 10:
-		escape = "\033[1;30;42m"
+	for commitDate, count := range cc.Data {
+		parsed, err := time.Parse(layout, commitDate)
+		if err != nil {
+			log.Println("date parsing error for: ", commitDate)
+			continue
+		}
+
+		year, weekOfYear := parsed.ISOWeek()
+		dayOfWeek := parsed.Weekday()
+
+		if year == cc.Year {
+			grid[dayOfWeek][weekOfYear-1] = count
+		}
 	}
 
-	if today {
-		escape = "\033[1;37;45m"
+	for _, row := range grid {
+		for _, col := range row {
+			cc.colorizer(strconv.Itoa(col), ColorBlue)
+		}
+		fmt.Println()
 	}
-
-	if val == 0 {
-		fmt.Printf(escape + "  - " + "\033[0m")
-		return
-	}
-
-	str := "  %d "
-	switch {
-	case val >= 10:
-		str = " %d "
-	case val >= 100:
-		str = "%d "
-	}
-
-	fmt.Printf(escape+str+"\033[0m", val)
 }
 
 func (cc ContributionChart) colorizer(message string, color Color) {
-	fmt.Println(string(color), message, string(ColorReset))
+	fmt.Print(string(color), message, string(ColorReset))
 }

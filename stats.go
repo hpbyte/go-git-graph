@@ -7,17 +7,13 @@ import (
 	"log"
 )
 
-const outOfRange = 99999
-const daysInLastSixMonths = 183
-const weeksInLastSixMonths = 26
-
 type Stats interface {
-	Calculate() map[int][]int
+	Calculate() map[int]int
 }
 
 type ContributionStats struct {
 	gitConfig *GitConfig
-	stats     map[int][]int
+	stats     map[string]int
 }
 
 func (cs *ContributionStats) aggregate(path string) {
@@ -38,14 +34,17 @@ func (cs *ContributionStats) aggregate(path string) {
 
 	err = commits.ForEach(func(c *object.Commit) error {
 		if c.Author.Email == cs.gitConfig.User.Email {
-			fmt.Println(c.Committer.When)
+			year, month, day := c.Committer.When.Date()
+
+			key := fmt.Sprintf("%d-%02d-%02d", year, month, day)
+			cs.stats[key] += 1
 		}
 
 		return nil
 	})
 }
 
-func (cs ContributionStats) Calculate() map[int][]int {
+func (cs ContributionStats) Calculate() map[string]int {
 	repos := []string{"/Users/htoopyaelwin/Personal/adventofcode2023/.git"}
 
 	for _, repo := range repos {
