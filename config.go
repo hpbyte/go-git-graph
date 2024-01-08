@@ -20,8 +20,9 @@ type GitConfig struct {
 }
 
 type Config struct {
-	BasePath  string
-	GitConfig GitConfig
+	BasePath   string
+	ClearCache bool
+	GitConfig  GitConfig
 }
 
 func (c *Config) Load() (Config, error) {
@@ -63,6 +64,7 @@ func (config *Config) loadFlags() error {
 	}
 
 	flag.StringVar(&config.BasePath, "p", currentDir, "directory to cacluate stats for")
+	flag.BoolVar(&config.ClearCache, "c", false, "clear the cached repos list")
 	flag.Parse()
 
 	config.BasePath, err = filepath.Abs(config.BasePath)

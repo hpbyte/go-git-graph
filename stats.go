@@ -16,20 +16,20 @@ type ContributionStats struct {
 	stats     map[string]int
 }
 
-func (cs *ContributionStats) aggregate(path string) {
+func (cs *ContributionStats) aggregate(path string) error {
 	repo, err := git.PlainOpen(path)
 	if err != nil {
-		log.Fatalf("failed to open the repo: %s\n", err)
+		return fmt.Errorf("failed to open the repo: %s\n", path)
 	}
 
 	headRef, err := repo.Head()
 	if err != nil {
-		log.Fatalf("failed to get the HEAD of the repo: %s\n", err)
+		return fmt.Errorf("failed to get the HEAD of the repo: %s\n", path)
 	}
 
 	commits, err := repo.Log(&git.LogOptions{From: headRef.Hash()})
 	if err != nil {
-		log.Fatalf("failed to get commit history: %s\n", err)
+		return fmt.Errorf("failed to get commit history: %s\n", path)
 	}
 
 	err = commits.ForEach(func(c *object.Commit) error {
@@ -42,13 +42,19 @@ func (cs *ContributionStats) aggregate(path string) {
 
 		return nil
 	})
+
+	return err
 }
 
-func (cs ContributionStats) Calculate(repos map[string][]string) map[string]int {
+func (cs *ContributionStats) Calculate(repos map[string][]string) map[string]int {
+	cs.stats = map[string]int{}
+
 	for _, repoList := range repos {
 		for _, repo := range repoList {
-			fmt.Println("repo: ", repo)
-			cs.aggregate(repo)
+			err := cs.aggregate(repo)
+			if err != nil {
+				log.Println(err)
+			}
 		}
 	}
 

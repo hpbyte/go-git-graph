@@ -15,15 +15,23 @@ func main() {
 	fmt.Printf("Welcome to GoGitGraph!, your chosen path: %s\n\n\n", config.BasePath)
 
 	cacher := Cacher{}
+
+	if config.ClearCache {
+		cacher.Clear()
+	}
+
 	cache := cacher.Fetch()
-	if cache == nil {
+	if cache != nil {
+		log.Println("provided path has been scanned before, using cached repo lists...")
+	} else {
 		res := GitFolderScanner{}.Scan(config.BasePath)
 
 		cache = cacher.Create(res)
 	}
 
-	contributionStats := ContributionStats{gitConfig: &config.GitConfig, stats: map[string]int{}}.Calculate(cache)
+	contributionStats := ContributionStats{gitConfig: &config.GitConfig}
+	stats := contributionStats.Calculate(cache)
 
-	contributionChart := ContributionChart{Data: contributionStats, Year: 2024}
+	contributionChart := ContributionChart{Data: stats, Year: 2024}
 	contributionChart.Render()
 }

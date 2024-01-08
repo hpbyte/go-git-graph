@@ -2,58 +2,54 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 )
 
 type Cacher struct{}
 
-func (c Cacher) getCacheFilePath() (string, error) {
-	cacheFilePath := "./.cache.json"
+const cacheFilePath = "./.cache.json"
 
+func (c Cacher) createCacheFile(path string) {
+	file, err := os.Create(path)
+	if err != nil {
+		log.Fatalf("error creating cache file: %s\n", err)
+	}
+	defer file.Close()
+
+	log.Println("new cache file created.")
+}
+
+func (c Cacher) getOrCreateCacheFile() string {
 	if _, err := os.Stat(cacheFilePath); os.IsNotExist(err) {
-		file, err := os.Create(cacheFilePath)
-		if err != nil {
-			return "", fmt.Errorf("error creating cache file: %s\n", err)
-		}
-		defer file.Close()
-
-		log.Printf("new cache file created.")
+		c.createCacheFile(cacheFilePath)
 	}
 
-	return cacheFilePath, nil
+	return cacheFilePath
 }
 
 func (c Cacher) Create(data map[string][]string) map[string][]string {
-	cacheFilePath, err := c.getCacheFilePath()
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	path := c.getOrCreateCacheFile()
 	// convert to json
 	jsonData, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
-		log.Fatalf("error marshaling data to JSON: %v", err)
+		log.Fatalf("error marshaling data to JSON: %v\n", err)
 	}
 
-	err = os.WriteFile(cacheFilePath, jsonData, 0644)
+	err = os.WriteFile(path, jsonData, 0644)
 	if err != nil {
-		log.Fatalf("error writing cache results: %v", err)
+		log.Fatalf("error writing cache results: %v\n", err)
 	}
 
-	log.Printf("successfully cached results")
+	log.Println("successfully cached results")
 
 	return data
 }
 
 func (c Cacher) Fetch() map[string][]string {
-	cacheFilePath, err := c.getCacheFilePath()
-	if err != nil {
-		log.Fatal(err)
-	}
+	path := c.getOrCreateCacheFile()
 
-	byteData, err := os.ReadFile(cacheFilePath)
+	byteData, err := os.ReadFile(path)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -62,4 +58,11 @@ func (c Cacher) Fetch() map[string][]string {
 	json.Unmarshal([]byte(byteData), &data)
 
 	return data
+}
+
+func (c Cacher) Clear() {
+	err := os.Remove(cacheFilePath)
+	if err != nil {
+		log.Fatalf("error deleting cache: %s\n", err)
+	}
 }
