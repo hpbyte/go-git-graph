@@ -26,12 +26,25 @@ type Chart interface {
 type ContributionChart struct {
 	Data map[string]int
 	Year int
+	grid [numOfDaysInWeek][numOfweeksInYear]int // 7 (days) x 53 (weeks) grid 0s for a year with 0s as default
 }
 
-func (cc ContributionChart) Render() {
-	// 7 (days) x 53 (weeks) grid 0s for a year with 0s as default
-	var grid [numOfDaysInWeek][numOfweeksInYear]int
+func (cc *ContributionChart) Render() {
+	cc.parse()
 
+	fmt.Printf("\n\n\n")
+
+	printMonths()
+	for i, row := range cc.grid {
+		printDayCol(i)
+		for _, col := range row {
+			printCell(col, false)
+		}
+		fmt.Println()
+	}
+}
+
+func (cc *ContributionChart) parse() {
 	for commitDate, count := range cc.Data {
 		parsed, err := time.Parse(layout, commitDate)
 		if err != nil {
@@ -43,17 +56,8 @@ func (cc ContributionChart) Render() {
 		dayOfWeek := parsed.Weekday()
 
 		if year == cc.Year {
-			grid[dayOfWeek][weekOfYear-1] = count
+			cc.grid[dayOfWeek][weekOfYear-1] = count
 		}
-	}
-
-	printMonths()
-	for i, row := range grid {
-		printDayCol(i)
-		for _, col := range row {
-			printCell(col, false)
-		}
-		fmt.Println()
 	}
 }
 
