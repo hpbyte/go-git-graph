@@ -23,7 +23,7 @@ func (gfs GitFolderScanner) Scan(path string) map[string][]string {
 	scan = func(basePath string, path string) {
 		entries, err := os.ReadDir(path)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("[Err]: scanning directories: %s", err)
 		}
 
 		for _, entry := range entries {

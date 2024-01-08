@@ -22,16 +22,16 @@ func main() {
 
 	cache := cacher.Fetch()
 	if cache != nil {
-		log.Println("provided path has been scanned before, using cached repo lists...")
+		log.Println("[Log]: provided path has been scanned before, using cached repo lists...")
 	} else {
 		res := GitFolderScanner{}.Scan(config.BasePath)
 
 		cache = cacher.Create(res)
 	}
 
-	contributionStats := ContributionStats{gitConfig: &config.GitConfig}
+	contributionStats := ContributionStats{gitConfig: &config.GitConfig, year: config.Year}
 	stats := contributionStats.Calculate(cache)
 
-	contributionChart := ContributionChart{Data: stats, Year: 2024}
+	contributionChart := ContributionChart{data: stats, year: config.Year}
 	contributionChart.Render()
 }

@@ -13,11 +13,11 @@ const cacheFilePath = "./.cache.json"
 func (c Cacher) createCacheFile(path string) {
 	file, err := os.Create(path)
 	if err != nil {
-		log.Fatalf("error creating cache file: %s\n", err)
+		log.Fatalf("[Err]: creating cache file: %s\n", err)
 	}
 	defer file.Close()
 
-	log.Println("new cache file created.")
+	log.Println("[Log]: new cache file created.")
 }
 
 func (c Cacher) getOrCreateCacheFile() string {
@@ -33,15 +33,15 @@ func (c Cacher) Create(data map[string][]string) map[string][]string {
 	// convert to json
 	jsonData, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
-		log.Fatalf("error marshaling data to JSON: %v\n", err)
+		log.Fatalf("[Err]: marshaling data to JSON: %v\n", err)
 	}
 
 	err = os.WriteFile(path, jsonData, 0644)
 	if err != nil {
-		log.Fatalf("error writing cache results: %v\n", err)
+		log.Fatalf("[Err]: writing cache results: %v\n", err)
 	}
 
-	log.Println("successfully cached results")
+	log.Println("[Log]: successfully cached results")
 
 	return data
 }
@@ -63,6 +63,6 @@ func (c Cacher) Fetch() map[string][]string {
 func (c Cacher) Clear() {
 	err := os.Remove(cacheFilePath)
 	if err != nil {
-		log.Fatalf("error deleting cache: %s\n", err)
+		log.Fatalf("[Err]: deleting cache: %s\n", err)
 	}
 }

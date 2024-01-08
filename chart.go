@@ -24,8 +24,8 @@ type Chart interface {
 }
 
 type ContributionChart struct {
-	Data map[string]int
-	Year int
+	data map[string]int
+	year int
 	grid [numOfDaysInWeek][numOfweeksInYear]int // 7 (days) x 53 (weeks) grid 0s for a year with 0s as default
 }
 
@@ -45,17 +45,16 @@ func (cc *ContributionChart) Render() {
 }
 
 func (cc *ContributionChart) parse() {
-	for commitDate, count := range cc.Data {
+	for commitDate, count := range cc.data {
 		parsed, err := time.Parse(layout, commitDate)
 		if err != nil {
-			log.Println("date parsing error for: ", commitDate)
-			continue
+			log.Fatalf("[Err]: parsing date error for: %s", commitDate)
 		}
 
 		year, weekOfYear := parsed.ISOWeek()
 		dayOfWeek := parsed.Weekday()
 
-		if year == cc.Year {
+		if year == cc.year {
 			cc.grid[dayOfWeek][weekOfYear-1] = count
 		}
 	}

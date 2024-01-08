@@ -6,6 +6,7 @@ import (
 	"gopkg.in/ini.v1"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 type ConfigLoader[T any] interface {
@@ -22,6 +23,7 @@ type GitConfig struct {
 type Config struct {
 	BasePath   string
 	ClearCache bool
+	Year       int
 	GitConfig  GitConfig
 }
 
@@ -40,18 +42,18 @@ func (c *Config) Load() (Config, error) {
 func (config *Config) loadGitConfig() error {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		return fmt.Errorf("error loading home dir: %s\n", err)
+		return fmt.Errorf("[Err]: loading home dir: %s\n", err)
 	}
 	gitConfigPath := filepath.Join(homeDir, ".gitconfig")
 
 	gConf, err := ini.Load(gitConfigPath)
 	if err != nil {
-		return fmt.Errorf("error loading git config: %s\n", err)
+		return fmt.Errorf("[Err]: loading git config: %s\n", err)
 	}
 
 	err = gConf.MapTo(&config.GitConfig)
 	if err != nil {
-		return fmt.Errorf("error parsing .gitconfig: %s\n", err)
+		return fmt.Errorf("[Err]: parsing .gitconfig: %s\n", err)
 	}
 
 	return nil
@@ -60,16 +62,17 @@ func (config *Config) loadGitConfig() error {
 func (config *Config) loadFlags() error {
 	currentDir, err := os.Getwd()
 	if err != nil {
-		return fmt.Errorf("error getting current dir: %w", err)
+		return fmt.Errorf("[Err]: error getting current dir: %w", err)
 	}
 
 	flag.StringVar(&config.BasePath, "p", currentDir, "directory to cacluate stats for")
 	flag.BoolVar(&config.ClearCache, "c", false, "clear the cached repos list")
+	flag.IntVar(&config.Year, "y", time.Now().Year(), "year to be aggregated")
 	flag.Parse()
 
 	config.BasePath, err = filepath.Abs(config.BasePath)
 	if err != nil {
-		return fmt.Errorf("cannot find the directory provided!, %w", err)
+		return fmt.Errorf("[Err]: finding the directory provided!, %w", err)
 	}
 
 	return nil
