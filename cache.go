@@ -25,11 +25,10 @@ func (c Cacher) getCacheFilePath() (string, error) {
 	return cacheFilePath, nil
 }
 
-func (c Cacher) Create(data map[string][]string) {
+func (c Cacher) Create(data map[string][]string) map[string][]string {
 	cacheFilePath, err := c.getCacheFilePath()
 	if err != nil {
 		log.Fatal(err)
-		return
 	}
 
 	// convert to json
@@ -44,4 +43,23 @@ func (c Cacher) Create(data map[string][]string) {
 	}
 
 	log.Printf("successfully cached results")
+
+	return data
+}
+
+func (c Cacher) Fetch() map[string][]string {
+	cacheFilePath, err := c.getCacheFilePath()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	byteData, err := os.ReadFile(cacheFilePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var data map[string][]string
+	json.Unmarshal([]byte(byteData), &data)
+
+	return data
 }

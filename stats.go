@@ -44,11 +44,12 @@ func (cs *ContributionStats) aggregate(path string) {
 	})
 }
 
-func (cs ContributionStats) Calculate() map[string]int {
-	repos := []string{"/Users/htoopyaelwin/Personal/adventofcode2023/.git"}
-
-	for _, repo := range repos {
-		cs.aggregate(repo)
+func (cs ContributionStats) Calculate(repos map[string][]string) map[string]int {
+	for _, repoList := range repos {
+		for _, repo := range repoList {
+			fmt.Println("repo: ", repo)
+			cs.aggregate(repo)
+		}
 	}
 
 	return cs.stats

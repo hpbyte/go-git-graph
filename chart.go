@@ -104,6 +104,5 @@ func printCell(count int, today bool) {
 		colorCode = highlightColor
 	}
 
-	// Print the colored cell
 	fmt.Printf("%s  %s", colorCode, resetColor)
 }
