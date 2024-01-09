@@ -2,6 +2,11 @@ package main
 
 import (
 	"fmt"
+	. "go-git-graph/pkg/cache"
+	. "go-git-graph/pkg/chart"
+	. "go-git-graph/pkg/config"
+	. "go-git-graph/pkg/scan"
+	. "go-git-graph/pkg/stats"
 	"log"
 )
 
@@ -29,9 +34,9 @@ func main() {
 		cache = cacher.Create(res)
 	}
 
-	contributionStats := ContributionStats{gitConfig: &config.GitConfig, year: config.Year}
+	contributionStats := ContributionStats{GitConfig: &config.GitConfig, Year: config.Year}
 	stats := contributionStats.Calculate(cache)
 
-	contributionChart := ContributionChart{data: stats, year: config.Year}
+	contributionChart := ContributionChart{Data: stats, Year: config.Year}
 	contributionChart.Render()
 }

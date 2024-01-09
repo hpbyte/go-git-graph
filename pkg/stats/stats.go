@@ -1,10 +1,12 @@
-package main
+package stats
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
-	"log"
+	. "go-git-graph/pkg/config"
 )
 
 type Stats interface {
@@ -12,8 +14,8 @@ type Stats interface {
 }
 
 type ContributionStats struct {
-	year      int
-	gitConfig *GitConfig
+	Year      int
+	GitConfig *GitConfig
 	stats     map[string]int
 }
 
@@ -34,10 +36,10 @@ func (cs *ContributionStats) aggregate(path string) error {
 	}
 
 	err = commits.ForEach(func(c *object.Commit) error {
-		if c.Author.Email == cs.gitConfig.User.Email {
+		if c.Author.Email == cs.GitConfig.User.Email {
 			year, month, day := c.Committer.When.Date()
 
-			if year == cs.year {
+			if year == cs.Year {
 				key := fmt.Sprintf("%d-%02d-%02d", year, month, day)
 				cs.stats[key] += 1
 			}
@@ -52,7 +54,7 @@ func (cs *ContributionStats) aggregate(path string) error {
 func (cs *ContributionStats) Calculate(repos map[string][]string) map[string]int {
 	cs.stats = map[string]int{}
 
-	log.Printf("[Log]: calculating for the year: %d...\n", cs.year)
+	log.Printf("[Log]: calculating for the year: %d...\n", cs.Year)
 
 	for _, repoList := range repos {
 		for _, repo := range repoList {

@@ -1,12 +1,13 @@
-package main
+package config
 
 import (
 	"flag"
 	"fmt"
-	"gopkg.in/ini.v1"
 	"os"
 	"path/filepath"
 	"time"
+
+	"gopkg.in/ini.v1"
 )
 
 type ConfigLoader[T any] interface {

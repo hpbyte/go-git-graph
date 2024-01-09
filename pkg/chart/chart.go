@@ -1,4 +1,4 @@
-package main
+package chart
 
 import (
 	"fmt"
@@ -24,8 +24,8 @@ type Chart interface {
 }
 
 type ContributionChart struct {
-	data map[string]int
-	year int
+	Data map[string]int
+	Year int
 	grid [numOfDaysInWeek][numOfweeksInYear]int // 7 (days) x 53 (weeks) grid 0s for a year with 0s as default
 }
 
@@ -45,7 +45,7 @@ func (cc *ContributionChart) Render() {
 }
 
 func (cc *ContributionChart) parse() {
-	for commitDate, count := range cc.data {
+	for commitDate, count := range cc.Data {
 		parsed, err := time.Parse(layout, commitDate)
 		if err != nil {
 			log.Fatalf("[Err]: parsing date error for: %s", commitDate)
@@ -54,7 +54,7 @@ func (cc *ContributionChart) parse() {
 		year, weekOfYear := parsed.ISOWeek()
 		dayOfWeek := parsed.Weekday()
 
-		if year == cc.year {
+		if year == cc.Year {
 			cc.grid[dayOfWeek][weekOfYear-1] = count
 		}
 	}
