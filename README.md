@@ -11,7 +11,7 @@ git clone https://github.com/hpbyte/go-git-graph
 
 cd go-git-graph
 
-go build
+go build ./cmd/go-git-graph
 ```
 
 ## Usage
