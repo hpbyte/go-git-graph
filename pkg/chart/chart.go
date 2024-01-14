@@ -3,12 +3,16 @@ package chart
 import (
 	"fmt"
 	"log"
+	"math"
+	"strings"
 	"time"
 )
 
 const layout = "2006-01-02"
 const numOfDaysInWeek = 7
 const numOfweeksInYear = 53
+const numOfCharsPerCell = 2
+const numOfCharsPerMonthCell = 3
 
 const (
 	blankColor       = "\033[48;5;238m"
@@ -34,7 +38,7 @@ func (cc *ContributionChart) Render() {
 
 	fmt.Printf("\n\n\n")
 
-	printMonths()
+	printMonths(cc.Year)
 	for i, row := range cc.grid {
 		printDayCol(i)
 		for _, col := range row {
@@ -73,19 +77,31 @@ func (cc *ContributionChart) parse() {
 	}
 }
 
-func printMonths() {
-	var months [53]string
-	offset := 0
+func findNumOfWeeksInMonth(year int, month time.Month) int {
+	firstOfNextMonth := time.Date(year, month+1, 1, 0, 0, 0, 0, time.UTC)
+
+	lastDayOfMonth := firstOfNextMonth.AddDate(0, 0, -1)
+
+	weeks := math.Ceil(float64(lastDayOfMonth.Day()) / 7.0)
+
+	return int(weeks)
+}
+
+func printMonths(year int) {
+	var builder strings.Builder
+
+	builder.WriteString("     ")
+
 	for month := time.January; month <= time.December; month++ {
-		months[offset] = month.String()[:3]
-		offset += 4
+		monthName := month.String()[:3]
+		numOfWeeks := findNumOfWeeksInMonth(year, month)
+		len := (numOfWeeks * numOfCharsPerCell) - numOfCharsPerMonthCell
+
+		formatted := fmt.Sprintf("%-3s%*s", monthName, len, "")
+		builder.WriteString(formatted)
 	}
 
-	fmt.Print("     ")
-	for _, month := range months {
-		fmt.Printf("%s ", month)
-	}
-	fmt.Println()
+	fmt.Println(builder.String())
 }
 
 func printDayCol(day int) {
