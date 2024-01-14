@@ -45,6 +45,8 @@ func (cc *ContributionChart) Render() {
 }
 
 func (cc *ContributionChart) parse() {
+	startOfYearOffset := numOfDaysInWeek - time.Date(cc.Year, 1, 1, 0, 0, 0, 0, time.UTC).Weekday()
+
 	for commitDate, count := range cc.Data {
 		parsed, err := time.Parse(layout, commitDate)
 		if err != nil {
@@ -54,8 +56,19 @@ func (cc *ContributionChart) parse() {
 		year, weekOfYear := parsed.ISOWeek()
 		dayOfWeek := parsed.Weekday()
 
+		// handle offset when startOfyear is not on Sunday 0
+		// e.g.
+		// - if the year starts on Monday 1, offset is 7 - 1 = 6
+		// - if commitDate is on Sunday 0, Week 1, it should be on 2nd Week due to offset
+		// - 7 - 0 > offset (6) => we move it to the next week
+		// pls be aware that week starts from 1 instead of 0, hence the condition is below
+		weekIndex := weekOfYear
+		if numOfDaysInWeek - dayOfWeek <= startOfYearOffset {
+			weekIndex -= 1
+		}
+
 		if year == cc.Year {
-			cc.grid[dayOfWeek][weekOfYear-1] = count
+			cc.grid[dayOfWeek][weekIndex] = count
 		}
 	}
 }
