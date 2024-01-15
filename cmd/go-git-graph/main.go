@@ -28,9 +28,11 @@ func main() {
 
 	cache := cacher.Fetch()
 	if cache != nil && cache[config.BasePath] != nil {
-		log.Println("[Log]: provided path has been scanned before, using cached repo lists...")
+		log.Println("[Log]: provided path has been scanned before, using cached repo lists.")
 	} else {
+		log.Println("[Log]: scanning git repos...")
 		res := GitFolderScanner{}.Scan(config.BasePath)
+		log.Println("[Log]: scanning completed")
 
 		cache = cacher.Create(res)
 	}
