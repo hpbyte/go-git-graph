@@ -4,11 +4,22 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"path/filepath"
 )
 
 type Cacher struct{}
 
-const cacheFilePath = "./.cache.json"
+func (c Cacher) getCacheFilePath() string {
+	const cacheFileName = ".go-git-graph.cache.json"
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		log.Panicf("[Err]: loading home dir: %s\n", err)
+	}
+
+	cacheFilePath := filepath.Join(homeDir, cacheFileName)
+
+	return cacheFilePath
+}
 
 func (c Cacher) createCacheFile(path string) {
 	file, err := os.Create(path)
@@ -21,6 +32,8 @@ func (c Cacher) createCacheFile(path string) {
 }
 
 func (c Cacher) getOrCreateCacheFile() string {
+	cacheFilePath := c.getCacheFilePath()
+
 	if _, err := os.Stat(cacheFilePath); os.IsNotExist(err) {
 		c.createCacheFile(cacheFilePath)
 	}
@@ -61,6 +74,7 @@ func (c Cacher) Fetch() map[string][]string {
 }
 
 func (c Cacher) Clear() {
+	cacheFilePath := c.getCacheFilePath()
 	err := os.Remove(cacheFilePath)
 	if err != nil {
 		log.Fatalf("[Err]: deleting cache: %s\n", err)
