@@ -7,6 +7,7 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	. "go-git-graph/pkg/config"
+	"go-git-graph/pkg/utils"
 )
 
 type Stats interface {
@@ -36,7 +37,7 @@ func (cs *ContributionStats) aggregate(path string) error {
 	}
 
 	err = commits.ForEach(func(c *object.Commit) error {
-		if c.Author.Email == cs.GitConfig.User.Email {
+		if utils.Contains(c.Author.Email, cs.GitConfig.User.Emails) {
 			year, month, day := c.Committer.When.Date()
 
 			if year == cs.Year {

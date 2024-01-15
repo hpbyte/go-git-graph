@@ -9,8 +9,9 @@ import (
 
 type Cacher struct{}
 
+const cacheFileName = ".ggg.cache.json"
+
 func (c Cacher) getCacheFilePath() string {
-	const cacheFileName = ".go-git-graph.cache.json"
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		log.Panicf("[Err]: loading home dir: %s\n", err)

@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 	"time"
 
-	"gopkg.in/ini.v1"
+	"github.com/BurntSushi/toml"
 )
 
-const configFileName = ".go-git-graph.toml"
+const configFileName = ".ggg.conf.toml"
 
 type ConfigLoader[T any] interface {
 	Load() (T, error)
@@ -18,9 +18,8 @@ type ConfigLoader[T any] interface {
 
 type GitConfig struct {
 	User struct {
-		Name  string `ini:"name"`
-		Email string `ini:"email"`
-	} `ini:"user"`
+		Emails []string
+	}
 }
 
 type Config struct {
@@ -47,16 +46,10 @@ func (config *Config) loadGitConfig() error {
 	if err != nil {
 		return fmt.Errorf("[Err]: loading home dir: %s\n", err)
 	}
-	gitConfigPath := filepath.Join(homeDir, configFileName)
+	configPath := filepath.Join(homeDir, configFileName)
 
-	gConf, err := ini.Load(gitConfigPath)
-	if err != nil {
-		return fmt.Errorf("[Err]: loading git config: %s\n", err)
-	}
-
-	err = gConf.MapTo(&config.GitConfig)
-	if err != nil {
-		return fmt.Errorf("[Err]: parsing .gitconfig: %s\n", err)
+	if _, err := toml.DecodeFile(configPath, &config.GitConfig); err != nil {
+		return fmt.Errorf("[Err]: loading config: %s\n", err)
 	}
 
 	return nil
