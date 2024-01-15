@@ -17,7 +17,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Welcome to GoGitGraph!, your chosen path: %s\n\n\n", config.BasePath)
+	fmt.Printf("\n\n")
+	log.Printf("[Log]: chosen path: %s\n", config.BasePath)
 
 	cacher := Cacher{}
 
