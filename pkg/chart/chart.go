@@ -80,7 +80,6 @@ func findNumOfWeeksInMonth(year int, month time.Month, prevWeek *int) int {
 	firstDayOfMonth := time.Date(year, month, 1, 0, 0, 0, 0, time.UTC)
 	lastDayOfMonth := firstDayOfMonth.AddDate(0, 1, -1)
 
-	log.Printf("prevWeek %d", *prevWeek)
 	_, firstWeekOfMonth := firstDayOfMonth.ISOWeek()
 	_, lastWeekOfMonth := lastDayOfMonth.ISOWeek()
 
@@ -92,12 +91,10 @@ func findNumOfWeeksInMonth(year int, month time.Month, prevWeek *int) int {
 		// otherwise lastWeekOfMonth would become 1
 		lastWeekOfMonth = numOfweeksInYear + (lastDayOfMonth.Day()-28)/numOfDaysInWeek
 	}
-	log.Printf("firstDayOfMonth: %s lastDayOfMonth: %s firstWeekOfMonth: %d, lastWeekOfMonth: %d\n", firstDayOfMonth, lastDayOfMonth, firstWeekOfMonth, lastWeekOfMonth)
 
 	numOfWeeksInMonth := lastWeekOfMonth - firstWeekOfMonth + 1
 
 	if *prevWeek == firstWeekOfMonth {
-		log.Println("firstweek and prevWeek is the same: ", firstDayOfMonth)
 		numOfWeeksInMonth -= 1
 	}
 
@@ -116,7 +113,6 @@ func printMonths(year int) {
 	for month := time.January; month <= time.December; month++ {
 		monthName := month.String()[:3]
 		numOfWeeks := findNumOfWeeksInMonth(year, month, &prevWeek)
-		log.Printf("month: %s, numOfWeeks: %d\n", monthName, numOfWeeks)
 		len := (numOfWeeks * numOfCharsPerCell) - numOfCharsPerMonthCell
 
 		formatted := fmt.Sprintf("%-3s%*s", monthName, len, "")
