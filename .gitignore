@@ -25,3 +25,6 @@ go.work
 
 # generated cache file
 .cache*
+
+**.DS_Store
+*ggg
